@@ -18,7 +18,7 @@ class MemeView(View):
         if meme_id is None:
             meme_list = []
 
-            for meme in Meme.objects.order_by("-modified")[:100]:
+            for meme in Meme.objects.order_by("-created")[:100]:
                 comment_list = []
                 for comment in Comment.objects.order_by("-created").filter(meme_id=meme.id):
                     comment_data = {
@@ -79,5 +79,46 @@ class MemeView(View):
         return HttpResponse(
             json.dumps({
                 "id": meme.id
-            }), content_type="application/json"
+            }), content_type="application/json",
+            status=201
+        )
+
+    @staticmethod
+    @csrf_exempt
+    def post_comment(request):
+        comment_data = json.loads(request.body)
+        meme = Meme.objects.get(id=comment_data["meme_id"])
+
+        if Comment.objects.filter(name=comment_data["name"], content=comment_data["content"], meme=meme).exists():
+            return HttpResponse("Duplicate comment - dont spam here", status=409)
+
+        comment = Comment(name=comment_data["name"], content=comment_data["content"], meme=meme)
+        comment.save()
+
+        return HttpResponse(
+            json.dumps({
+                "meme_id": meme.id,
+                "id": comment.id
+            }), content_type="application/json",
+            status=201
+        )
+
+    @staticmethod
+    @csrf_exempt
+    def like_meme(request):
+        meme_data = json.loads(request.body)
+
+        try:
+            meme = Meme.objects.get(id=meme_data["meme_id"])
+        except:
+            return HttpResponse("Meme not found - Task failed successfully", status=404)
+
+        meme.likes = meme.likes + 1
+        meme.save()
+
+        return HttpResponse(
+            json.dumps({
+                "id": meme.id
+            }), content_type="application/json",
+            status=201
         )
