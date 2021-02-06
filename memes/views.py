@@ -13,14 +13,57 @@ class MemeView(View):
     def dispatch(self, *args, **kwargs):
         return super(MemeView, self).dispatch(*args, **kwargs)
 
-    def get(self, request, userid=None):
-        if userid is None:
-            return HttpResponse("Hello yeet")
+    def get(self, request, meme_id=None):
+
+        if meme_id is None:
+            meme_list = []
+
+            for meme in Meme.objects.order_by("-modified")[:100]:
+                comment_list = []
+                for comment in Comment.objects.order_by("-created").filter(meme_id=meme.id):
+
+                    comment_data = {
+                        "id": comment.id,
+                        "name": comment.name,
+                        "content": comment.content
+                    }
+                    comment_list.append(comment_data)
+
+                meme_data = {
+                    "id": meme.id,
+                    "name": meme.name,
+                    "url": meme.url,
+                    "caption": meme.caption,
+                    "likes": meme.likes,
+                    "comments": comment_list,
+                }
+                meme_list.append(meme_data)
+
+            return HttpResponse(json.dumps(meme_list), content_type="application/json")
+
         else:
+
+            meme = Meme.objects.get(id=meme_id)
+            comment_list = []
+            for comment in Comment.objects.order_by("-created").filter(meme_id=meme.id):
+
+                comment_data = {
+                    "id": comment.id,
+                    "name": comment.name,
+                    "content": comment.content
+                }
+                comment_list.append(comment_data)
+
+            meme_data = {
+                "id": meme.id,
+                "name": meme.name,
+                "url": meme.url,
+                "caption": meme.caption,
+                "likes": meme.likes,
+                "comments": comment_list,
+            }
             return HttpResponse(
-                json.dumps({
-                    "test": userid
-                }), content_type="application/json"
+                json.dumps(meme_data), content_type="application/json"
             )
 
     def post(self, request):

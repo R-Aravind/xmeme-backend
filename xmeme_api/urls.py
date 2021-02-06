@@ -18,6 +18,6 @@ from django.urls import path
 from memes.views import MemeView
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/meme/<str:userid>', MemeView.as_view()),
+    path('api/meme/<str:meme_id>', MemeView.as_view()),
     path('api/meme/', MemeView.as_view())
 ]
