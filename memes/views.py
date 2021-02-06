@@ -83,11 +83,33 @@ class MemeView(View):
             status=201
         )
 
+    def patch(self, request):
+        meme_data = json.loads(request.body)
+
+        try:
+            meme = Meme.objects.get(id=meme_data["id"])
+        except:
+            return HttpResponse("Meme not found - Task failed successfully", status=404)
+
+        if Meme.objects.filter(caption=meme_data["caption"], url=meme_data["url"]).exists():
+            return HttpResponse("Modified meme already exists - What are you trying to change?", status=409)
+
+        meme.caption = meme_data["caption"]
+        meme.url = meme_data["url"]
+        meme.save()
+
+        return HttpResponse("Meme Updated - Change is good, trust me.", status=201)
+
+
     @staticmethod
     @csrf_exempt
     def post_comment(request):
         comment_data = json.loads(request.body)
-        meme = Meme.objects.get(id=comment_data["meme_id"])
+
+        try:
+            meme = Meme.objects.get(id=comment_data["meme_id"])
+        except:
+            return HttpResponse("Meme not found - Task failed successfully", status=404)
 
         if Comment.objects.filter(name=comment_data["name"], content=comment_data["content"], meme=meme).exists():
             return HttpResponse("Duplicate comment - dont spam here", status=409)
