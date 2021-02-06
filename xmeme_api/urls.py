@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from memes.views import Meme
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/meme/<str:userid>', Meme.as_view()),
+    path('api/meme/', Meme.as_view())
 ]
