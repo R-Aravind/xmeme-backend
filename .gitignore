@@ -6,4 +6,5 @@ db.sqlite3
 media
 .idea/
 
+memes/migrations/
 venv/
