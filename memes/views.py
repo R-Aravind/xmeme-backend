@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -7,11 +6,11 @@ from django.utils.decorators import method_decorator
 import json
 
 
-class Meme(View):
+class MemeView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(Meme, self).dispatch(*args, **kwargs)
+        return super(MemeView, self).dispatch(*args, **kwargs)
 
     def get(self, request, userid=None):
         if userid is None:
@@ -24,7 +23,7 @@ class Meme(View):
         )
 
     def post(self, request):
-        post_data = request.POST
+        post_data = json.loads(request.body)
         return HttpResponse(
             json.dumps({
                 "name": post_data["name"],
