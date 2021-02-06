@@ -9,7 +9,7 @@ class Meme(models.Model):
     url = models.URLField()
     caption = models.CharField(max_length=400)
 
-    likes = models.IntegerField()
+    likes = models.IntegerField(default=0, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
@@ -19,6 +19,9 @@ class Meme(models.Model):
             self.created = timezone.now()
         self.modified = timezone.now()
         return super(Meme, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "meme id: {} by {}".format(self.id, self.name)
 
 
 class Comment(models.Model):
@@ -33,3 +36,6 @@ class Comment(models.Model):
         if not self.id:
             self.created = timezone.now()
         return super(Comment, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "comment id: {} by {} on meme:{}".format(self.id, self.name, self.meme_id)
