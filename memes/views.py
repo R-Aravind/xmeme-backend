@@ -21,7 +21,6 @@ class MemeView(View):
             for meme in Meme.objects.order_by("-modified")[:100]:
                 comment_list = []
                 for comment in Comment.objects.order_by("-created").filter(meme_id=meme.id):
-
                     comment_data = {
                         "id": comment.id,
                         "name": comment.name,
@@ -43,10 +42,13 @@ class MemeView(View):
 
         else:
 
-            meme = Meme.objects.get(id=meme_id)
+            try:
+                meme = Meme.objects.get(id=meme_id)
+            except:
+                return HttpResponse("Meme not found - Task failed successfully", status=404)
+
             comment_list = []
             for comment in Comment.objects.order_by("-created").filter(meme_id=meme.id):
-
                 comment_data = {
                     "id": comment.id,
                     "name": comment.name,
@@ -68,6 +70,10 @@ class MemeView(View):
 
     def post(self, request):
         post_data = json.loads(request.body)
+
+        if Meme.objects.filter(name=post_data["name"], caption=post_data["caption"], url=post_data["url"]).exists():
+            return HttpResponse("Meme already exists - Duplicates, Duplicates Everywhere", status=409)
+
         meme = Meme(name=post_data["name"], caption=post_data["caption"], url=post_data["url"])
         meme.save()
         return HttpResponse(
