@@ -8,3 +8,7 @@ media
 
 memes/migrations/
 venv/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

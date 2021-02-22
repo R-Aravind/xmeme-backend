@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from memes.views import MemeView
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('api/memes/<str:meme_id>', MemeView.as_view()),
     path('api/memes/', MemeView.as_view()),
     path('api/comment/', MemeView.post_comment),
